@@ -14,7 +14,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     normalizationContext={
+ *          "groups"={"users_read"}
+ *     }
+ * )
  * @UniqueEntity("email", message="Un utilisateur avec cet adresse email existe déjà")
  */
 class User implements UserInterface
@@ -23,13 +27,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"customers_read", "invoices_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresource", "users_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"customers_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_subresource", "users_read"})
      * @Assert\NotBlank(message="L'email est obligatoire")
      * @Assert\Email(message="l'Email '{{ value }}' n'est pas dans un format valide")
      */
@@ -50,7 +54,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresource", "users_read"})
      * @Assert\NotBlank(message="Le prénom de l'utilisateur est obligatoire")
      * @Assert\Length(min="3", max="255", minMessage="le prénom de l'utilisateur doit être compris entre 3 et 255 caractère", maxMessage="le prénom de l'utilisateur doit être compris entre 3 et 255 caractère")
      */
@@ -58,7 +62,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresource", "users_read"})
      * @Assert\NotBlank(message="Le nom de famille de l'utilisateur est obligatoire")
      * @Assert\Length(min="3", max="255", minMessage="le nom de famille de l'utilisateur doit être compris entre 3 et 255 caractère", maxMessage="le nom de famille de l'utilisateur doit être compris entre 3 et 255 caractère")
      */
