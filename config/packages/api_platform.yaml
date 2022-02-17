@@ -1,5 +1,7 @@
 api_platform:
     title: 'API COURSE SYM REACT'
+    version: '1.0.4'
+    show_webby: true
     mapping:
         paths: ['%kernel.project_dir%/src/Entity']
     patch_formats:

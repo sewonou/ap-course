@@ -4,16 +4,28 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
- * @ApiResource()
+ * @ApiResource(
+ *     collectionOperations={"GET", "POST"},
+ *     itemOperations={"GET", "PUT", "DELETE"},
+ *     subresourceOperations={
+ *          "invoices_get_subresource"={"path"="/customers/{id}/invoices"}
+ *     },
+ *     normalizationContext={
+ *          "groups"= {"customers_read"}
+ *     }
+ * )
  * @ApiFilter(SearchFilter::class, properties={
  *     "firstName":"partial",
  *     "lastName":"partial",
@@ -27,36 +39,51 @@ class Customer
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"customers_read", "invoices_read"})
+     *
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="Le prénom du customer est obligatoire")
+     * @Assert\Length(min=3,minMessage="Le prénom doit avoir entre 3 et 255 caractère", max=255, maxMessage="Le prénom doit avoir au plus 255 caractère")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="Le nom du customer est obligatoire")
+     * @Assert\Length(min=3, minMessage="Le nom doit avoir entre 3 et 255 caractère", max=255, maxMessage="Le nom doit avoir au plus 255 caractère")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"customers_read", "invoices_read"})
+     * @Assert\NotBlank(message="L'adresse email du customer est obligatoire")
+     * @Assert\Email(message="Le format de l'adresse email '{{ value }}' doit être valide")
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"customers_read", "invoices_read"})
      */
     private $company;
 
     /**
      * @ORM\OneToMany(targetEntity=Invoice::class, mappedBy="customer")
+     * @Groups({"customers_read"})
+     * @ApiSubresource()
      */
     private $invoices;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="customers")
+     * @Groups({"customers_read"})
      *
      */
     private $user;
@@ -69,6 +96,54 @@ class Customer
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * Permet de récupérer le total des invoices
+     * @Groups({"customers_read"})
+     * @return float
+     */
+    public function getTotalAmount() : float
+    {
+        return array_reduce($this->invoices->toArray(), function ($total, $invoice){
+            return $total + $invoice->getAmount();
+        }, 0);
+    }
+
+    /**
+     * Permet de récupérer le total non payé (hors des factures payées ou annulées)
+     * @Groups({"customers_read"})
+     * @return float
+     */
+    public function getUnpaidAmount() : float
+    {
+        return array_reduce($this->invoices->toArray(), function ($total, $invoice){
+            return $total + ($invoice->getStatus()==="SENT" ? $invoice->getAmount() : 0 );
+        }, 0);
+    }
+
+    /**
+     * Permet de retourner le totam des facture payé
+     * @Groups({"customers_read"})
+     * @return float
+     */
+    public function getPaidAmount() : float
+    {
+        return array_reduce($this->invoices->toArray(), function ($total, $invoice){
+            return $total + ($invoice->getStatus() === "PAID" ? $invoice->getAmount() : 0);
+        }, 0);
+    }
+
+    /**
+     * Permet de retourner le total des facture annulé
+     * @Groups({"customers_read"})
+     * @return float
+     */
+    public function getCancelledAmount() : float
+    {
+        return array_reduce($this->invoices->toArray(), function ($total, $invoice){
+            return $total + ($invoice->getStatus() === "CANCELLED" ? $invoice->getAmount() : 0);
+        }, 0);
     }
 
     public function getFirstName(): ?string
