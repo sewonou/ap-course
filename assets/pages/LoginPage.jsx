@@ -1,7 +1,7 @@
 import React, {useState, useContext} from 'react';
 import authAPI from "../services/authAPI";
 import AuthContext from "../context/AuthContext";
-
+import Field from "../components/forms/Field";
 
 const LoginPage = ({ history}) => {
 
@@ -37,35 +37,22 @@ const LoginPage = ({ history}) => {
         <>
             <h1>Connexion à l'application</h1>
 
-            <form onSubmit={handleSubmit} method="post">
-                <div className="form-group">
-                    <label htmlFor="username">Adresse email</label>
-                    <input
-                        value={credentials.username}
-                        onChange={handleChange}
-                        type="text"
-                        className={"form-control" + (error && " is-invalid")}
-                        placeholder="Adresse email de connexion"
-                        name="username"
-                        id="username"
-                        autoComplete="username"
-                    />
-                    {error && <p className="invalid-feedback">{error}</p>}
-                </div>
-                <div className="form-group mt-2">
-                    <label htmlFor="password" className="">Mot de passe</label>
-                    <input
-                        value={credentials.password}
-                        onChange={handleChange}
-                        type="password"
-                        className={"form-control" + (error && " is-invalid")}
-                        placeholder="Mot de passe de connexion"
-                        name="password"
-                        id="password"
-                        autoComplete="current-password"
-                    />
-                    {error && <p className="invalid-feedback">{error}</p>}
-                </div>
+            <form onSubmit={handleSubmit}>
+                <Field
+                    label="Adresse email"
+                    onChange={handleChange}
+                    name="username" value={credentials.username}
+                    placeholder="Adresse email de connexion"
+                    error={error}
+                />
+                <Field
+                    name="password"
+                    label="Mot de passe"
+                    onChange={handleChange}
+                    type="password"
+                    placeholder="Mot de passe de connexion"
+                    error={error}
+                />
                 <div className="form-group mt-2">
                     <button type="submit" className="btn btn-success">Je me connecte</button>
                 </div>

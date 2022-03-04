@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import Pagination from "../components/Pagination";
-import axios from 'axios';
 import moment from 'moment';
-import InvoiceAPI from "../services/invoicesAPI";
+import InvoicesAPI from "../services/invoicesAPI";
+import {Link} from "react-router-dom";
 
 const STATUS_CLASSES = {
     PAID : "primary",
@@ -27,7 +27,7 @@ const InvoicesPage = (props) => {
     //Récupértion des invoices
     const fetchInvoices = async  () => {
         try{
-            const  data = await InvoiceAPI.findAll();
+            const  data = await InvoicesAPI.findAll();
             setInvoices(data);
         }catch (error) {
             console.log(error.response);
@@ -72,7 +72,7 @@ const InvoicesPage = (props) => {
         const  originalnvoices = [...invoices];
         setInvoices(invoices.filter(invoice => invoice.id !== id));
         try {
-            await InvoiceAPI.delete(id);
+            await InvoicesAPI.delete(id);
             
         }catch (error) {
             console.log(error.response);
@@ -83,7 +83,11 @@ const InvoicesPage = (props) => {
 
     return (
         <>
-            <h1>Liste des factures</h1>
+            <div className="mb-3 d-flex justify-content-between align-items-center">
+                <h1>Liste des Facture</h1>
+                <Link to="/invoice/new" className="btn btn-primary">Créer une facture</Link>
+            </div>
+
             <div className="form-group">
                 <input type="text" className="form-control" placeholder="Rechercher ..." onChange={handleSearch} value={search}/>
             </div>
@@ -112,11 +116,11 @@ const InvoicesPage = (props) => {
                         </td>
                         <td className="text-center">{invoice.amount.toLocaleString()}€</td>
                         <td className="text-right">
-                            <button
-                                /*onClick={()=> handleDelete(invoice.id)}*/
+                            <Link
+                                to={"/invoice/" +invoice.id}
                                 className="btn btn-sm btn-primary rounded-pill m-lg-1">
                                 editer
-                            </button>
+                            </Link>
                             <button
                                 onClick={()=> handleDelete(invoice.id)}
                                 className="btn btn-sm btn-danger rounded-pill">
