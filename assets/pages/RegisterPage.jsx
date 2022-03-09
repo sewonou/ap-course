@@ -46,9 +46,10 @@ const RegisterPage = ({history}) => {
             setErrors({});
             history.replace("/login");
             // TODO : NOTIFICATION DE SUCCES
+            toast.success("Vous êtes désormais inscrit. Connecté vous !");
 
         }catch ({response}) {
-            console.log(response);
+            //console.log(response);
             const {violations} = response.data ;
             if(violations){
 
@@ -58,9 +59,10 @@ const RegisterPage = ({history}) => {
                 setErrors(apiErrors);
 
                 // TODO : NOTIFICATION D'EREURS
+                toast.error("Une erreur est survenue veuillez recommencer !");
             }
         }
-        console.log(user);
+        //console.log(user);
     };
 
     return (<>

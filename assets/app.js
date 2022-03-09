@@ -12,12 +12,14 @@ import ReactDOM from 'react-dom';
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import {HashRouter, Switch, Route, withRouter} from  'react-router-dom';
-
+import { ToastContainer, toast } from 'react-toastify';
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 // start the Stimulus application
 import './bootstrap';
+
 import CustomersPage from "./pages/CustomersPage";
 //import CustomersPageWithPagination from "./pages/CustomerPageWithPagination";
 import InvoicesPage from "./pages/InvoicesPage";
@@ -49,13 +51,15 @@ const App = () => {
                     <Route path="/login" component={LoginPage}/>
                     <Route path="/register" component={RegisterPage}/>
                     <PrivateRoute path="/customers" component={CustomersPage}/>
-                    <PrivateRoute path="/customer/:id" component={CustomerPage}/>
+                    <PrivateRoute path="/customers/:id" component={CustomerPage}/>
                     <PrivateRoute path="/invoices" component={InvoicesPage}/>
-                    <PrivateRoute path="/invoice/:id" component={InvoicePage}/>
+                    <PrivateRoute path="/invoices/:id" component={InvoicePage}/>
                     <Route path="/" component={HomePage} />
                 </Switch>
             </main>
+
         </HashRouter>
+        <ToastContainer position ={toast.POSITION.BOTTOM_RIGHT} icon={true} />
         </AuthContext.Provider>
     );
 };

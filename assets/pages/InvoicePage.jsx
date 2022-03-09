@@ -4,7 +4,7 @@ import Select from "../components/forms/Select"
 import {Link} from "react-router-dom";
 import CustomersAPI from "../services/customersAPI";
 import InvoicesAPI from "../services/invoicesAPI"
-import axios from 'axios';
+import {toast} from "react-toastify";
 
 const InvoicePage = ({match, history}) => {
     const [invoice, setInvoice] = useState({
@@ -37,9 +37,11 @@ const InvoicePage = ({match, history}) => {
             setInvoice({amount, customer: customer.id, status});
 
         }catch (error) {
-            console.log(error.response);
-            history.replace("/invoices");
+            //console.log(error.response);
             // TODO : Notification d'une erreur
+            toast.error("Impossible de charger la facture")
+            history.replace("/invoices");
+
         }
     };
 
@@ -51,9 +53,11 @@ const InvoicePage = ({match, history}) => {
             if(!invoice.customer) setInvoice({...invoice, customer: data[0].id});
 
         }catch(error){
-            console.log(error.response);
-            history.replace("/invoices");
+            //console.log(error.response);
             // TODO : Notification d'une erreur
+            toast.error("Impossible de chargé les clients");
+            history.replace("/invoices");
+
         }
     };
 
@@ -77,7 +81,7 @@ const InvoicePage = ({match, history}) => {
 
     const handleChange = ({currentTarget}) => {
         const {name, value} = currentTarget;
-        setInvoice({...invoice, [name]: value})
+        setInvoice({...invoice, [name]: value});
     };
 
     const handleSubmit = async (event) => {
@@ -87,14 +91,15 @@ const InvoicePage = ({match, history}) => {
                 await InvoicesAPI.update(id, invoice);
                 setErrors({});
                 // TODO : Flash de notification de succès
+                toast.success("La facture " + invoice.chrono  +" a bien été modifier!");
             }else{
                 await InvoicesAPI.create(invoice);
                 setErrors({});
-                history.replace("/invoices")
                 // TODO : Flash de notification de succès
-            }
-            // TODO : Flash de notification des erreurs
+                toast.success("La facture " + invoice.chrono  +" a bien été enregistrer!");
+                history.replace("/invoices")
 
+            }
 
         }catch ({response}) {
             const {violations} = response.data ;
@@ -106,6 +111,7 @@ const InvoicePage = ({match, history}) => {
                 setErrors(apiErrors);
 
                 // TODO : NOTIFICATION D'EREURS
+                toast.error("Une erreur est surenue. Veuillez recommencer la sauvergade de la facture !")
             }
         }
     };
