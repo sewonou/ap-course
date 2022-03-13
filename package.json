@@ -18,6 +18,7 @@
     },
     "dependencies": {
         "axios": "^0.26.0",
+        "dotenv": "^16.0.0",
         "jwt-decode": "^2.2.0",
         "moment": "^2.29.1",
         "react": "^16.8.6",
